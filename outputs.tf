@@ -1,7 +1,7 @@
-output "vm_name" {
-  value = proxmox_virtual_environment_vm.docker_host.name
+output "docker_host_name" {
+  value = module.docker_host.name
 }
 
-output "vm_id" {
-  value = proxmox_virtual_environment_vm.docker_host.vm_id
+output "docker_host_vm_id" {
+  value = module.docker_host.vm_id
 }

@@ -13,62 +13,20 @@ provider "proxmox" {
   insecure  = true
 }
 
-resource "proxmox_virtual_environment_vm" "docker_host" {
-  name      = "tf-test"
-  node_name = "proxmox"
-  vm_id     = 200
+module "docker_host" {
+  source = "./modules/vm"
 
-  clone {
-    vm_id = 9200
-    full  = false
-  }
+  vm_id          = 200
+  name           = "tf-test"
+  template_id    = 9200
+  cores          = 2
+  memory         = 4096
+  disk_size      = 20
 
-  scsi_hardware = "virtio-scsi-pci"
+  bridge         = "vmbr0"
+  ip_address     = "192.168.2.50/24"
+  gateway        = "192.168.2.1"
+  dns_servers    = ["192.168.2.1"]
 
-  cpu {
-    cores   = 2
-    sockets = 1
-    type    = "host"
-  }
-
-  memory {
-    dedicated = 4096
-  }
-
-  disk {
-    datastore_id = "local-lvm"
-    interface    = "scsi0"
-    size         = 20
-    discard      = "on"
-    iothread     = false
-  }
-
-  initialization {
-    datastore_id = "local-lvm"
-
-    ip_config {
-      ipv4 {
-        address = "192.168.2.50/24"
-        gateway = "192.168.2.1"
-      }
-    }
-
-    dns {
-      servers = ["192.168.2.1"]
-    }
-
-    user_account {
-      keys = [trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))]
-    }
-  }
-
-  network_device {
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  agent {
-    enabled = true
-    timeout = "2m"
-  }
+  ssh_public_key = trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))
 }
