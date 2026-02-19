@@ -1,0 +1,5 @@
+# Proxmox API configuration
+# Replace these values with your environment details
+
+proxmox_endpoint  = "https://PROXMOXHOST:8006/"
+proxmox_api_token = "root@pam!terraform=SECRET-HERE"
