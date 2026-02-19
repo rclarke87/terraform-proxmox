@@ -17,7 +17,7 @@ module "docker_host" {
   source = "./modules/vm"
 
   vm_id          = 200
-  name           = "tf-test"
+  name           = "docker-host"
   template_id    = 9200
   cores          = 2
   memory         = 4096
@@ -25,6 +25,24 @@ module "docker_host" {
 
   bridge         = "vmbr0"
   ip_address     = "192.168.2.50/24"
+  gateway        = "192.168.2.1"
+  dns_servers    = ["192.168.2.1"]
+
+  ssh_public_key = trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))
+}
+
+module "gitlab" {
+  source = "./modules/vm"
+
+  vm_id          = 201
+  name           = "gitlab"
+  template_id    = 9200
+  cores          = 2
+  memory         = 4096
+  disk_size      = 20
+
+  bridge         = "vmbr0"
+  ip_address     = "192.168.2.51/24"
   gateway        = "192.168.2.1"
   dns_servers    = ["192.168.2.1"]
 
