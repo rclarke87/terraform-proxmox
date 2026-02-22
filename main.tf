@@ -17,7 +17,7 @@ module "docker_host" {
   source = "./modules/vm"
 
   vm_id          = 200
-  name           = "docker-host"
+  name           = "docker01"
   template_id    = 9200
   cores          = 2
   memory         = 4096
@@ -35,7 +35,7 @@ module "gitlab" {
   source = "./modules/vm"
 
   vm_id          = 201
-  name           = "gitlab"
+  name           = "gitlab-host"
   template_id    = 9200
   cores          = 2
   memory         = 4096
