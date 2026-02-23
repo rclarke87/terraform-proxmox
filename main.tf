@@ -38,9 +38,6 @@ resource "local_file" "ansible_inventory" {
   filename = "../homelab-ansible/inventory/hosts.yml"
 
   content = templatefile("${path.module}/inventory.tmpl", {
-    hosts = {
-      for name, mod in module.vms :
-      name => replace(mod.ip_address, "/24", "")
-    }
+    hosts = local.hosts
   })
 }

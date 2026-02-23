@@ -1,6 +1,21 @@
 all:
-  hosts:
-%{ for name, ip in hosts ~}
-    ${name}:
-      ansible_host: ${ip}
+  children:
+%{ for tier in distinct([for h in hosts : h.tier]) ~}
+    ${tier}_hosts:
+      children:
+
+%{   for role in distinct([for h in hosts : h.role if h.tier == tier]) ~}
+        ${tier}_${role}:
+          hosts:
+%{     for name, host in hosts ~}
+%{       if host.tier == tier && host.role == role ~}
+            ${name}:
+              ansible_host: ${replace(host.ip_address, "/24", "")}
+              ansible_user: ubuntu
+              ansible_python_interpreter: /usr/bin/python3
+
+%{       endif ~}
+%{     endfor ~}
+%{   endfor ~}
+
 %{ endfor ~}
