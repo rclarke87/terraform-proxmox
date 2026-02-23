@@ -1,0 +1,6 @@
+all:
+  hosts:
+%{ for name, ip in hosts ~}
+    ${name}:
+      ansible_host: ${ip}
+%{ endfor ~}

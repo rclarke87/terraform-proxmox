@@ -6,6 +6,10 @@ variable "name" {
   type = string
 }
 
+variable "template_id" {
+  type = number
+}
+
 variable "cores" {
   type = number
 }
@@ -19,8 +23,7 @@ variable "disk_size" {
 }
 
 variable "bridge" {
-  type    = string
-  default = "vmbr0"
+  type = string
 }
 
 variable "ip_address" {
@@ -38,11 +41,6 @@ variable "dns_servers" {
 variable "ssh_public_key" {
   type = string
 }
-
-variable "template_id" {
-  type = number
-}
-
 variable "full_clone" {
   type    = bool
   default = false

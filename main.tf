@@ -13,38 +13,34 @@ provider "proxmox" {
   insecure  = true
 }
 
-module "docker_host" {
-  source = "./modules/vm"
+module "vms" {
+  source   = "./modules/vm"
+  for_each = local.hosts
 
-  vm_id          = 200
-  name           = "docker01"
-  template_id    = 9200
-  cores          = 2
-  memory         = 4096
-  disk_size      = 20
+  vm_id       = each.value.vm_id
+  name        = each.key
+  template_id = 9200
 
-  bridge         = "vmbr0"
-  ip_address     = "192.168.2.50/24"
-  gateway        = "192.168.2.1"
-  dns_servers    = ["192.168.2.1"]
+  # Merge defaults with overrides
+  cores     = merge(local.default_spec, each.value).cores
+  memory    = merge(local.default_spec, each.value).memory
+  disk_size = merge(local.default_spec, each.value).disk_size
 
-  ssh_public_key = trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))
+  bridge      = "vmbr0"
+  ip_address  = each.value.ip_address
+  gateway     = "192.168.2.1"
+  dns_servers = ["192.168.2.1"]
+
+  ssh_public_key = trimspace(file("~/.ssh/id_ed25519.pub"))
 }
 
-module "gitlab" {
-  source = "./modules/vm"
+resource "local_file" "ansible_inventory" {
+  filename = "../homelab-ansible/inventory/hosts.yml"
 
-  vm_id          = 201
-  name           = "gitlab-host"
-  template_id    = 9200
-  cores          = 2
-  memory         = 4096
-  disk_size      = 20
-
-  bridge         = "vmbr0"
-  ip_address     = "192.168.2.51/24"
-  gateway        = "192.168.2.1"
-  dns_servers    = ["192.168.2.1"]
-
-  ssh_public_key = trimspace(file(pathexpand("~/.ssh/id_ed25519.pub")))
+  content = templatefile("${path.module}/inventory.tmpl", {
+    hosts = {
+      for name, mod in module.vms :
+      name => replace(mod.ip_address, "/24", "")
+    }
+  })
 }

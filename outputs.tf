@@ -1,7 +1,9 @@
-output "docker_host_name" {
-  value = module.docker_host.name
-}
-
-output "docker_host_vm_id" {
-  value = module.docker_host.vm_id
+output "vms" {
+  value = {
+    for name, mod in module.vms :
+    name => {
+      vm_id      = mod.vm_id
+      ip_address = mod.ip_address
+    }
+  }
 }
